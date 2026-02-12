@@ -1,0 +1,78 @@
+# AMED DMP mapping definition
+# Maps CIR fields to AMED Excel form cell coordinates.
+
+meta:
+  format_id: amed
+  format_name: "AMED データマネジメントプラン"
+  file_type: xlsx
+
+mapping:
+  project_title:
+    cir_path: "project.0.title"
+    excel_cell: "B7"
+    required: true
+
+  principal_investigator_name:
+    cir_path: "contact.name"
+    excel_cell: "B5"
+    required: true
+
+  principal_investigator_affiliation:
+    cir_path: "contact.affiliation.0.name"
+    excel_cell: "B6"
+    required: true
+
+  erad_project_id:
+    cir_path: "project.0.erad_project_id"
+    excel_cell: "B4"
+    required: false
+
+  project_start:
+    cir_path: "project.0.start"
+    excel_cell: "B8"
+    required: false
+
+  project_end:
+    cir_path: "project.0.end"
+    excel_cell: "B9"
+    required: false
+
+  dataset_title:
+    cir_path: "dataset.0.title"
+    excel_cell: "B12"
+    required: true
+
+  dataset_description:
+    cir_path: "dataset.0.description"
+    excel_cell: "B13"
+    required: false
+
+  data_type:
+    cir_path: "dataset.0.type"
+    excel_cell: "B14"
+    required: false
+
+  data_access:
+    cir_path: "dataset.0.distribution.0.data_access"
+    excel_cell: "B15"
+    required: true
+
+  repository_url:
+    cir_path: "dataset.0.distribution.0.host.url"
+    excel_cell: "B16"
+    required: false
+
+  data_format:
+    cir_path: "dataset.0.distribution.0.format.0"
+    excel_cell: "B17"
+    required: false
+
+  personal_data:
+    cir_path: "dataset.0.personal_data"
+    excel_cell: "B18"
+    required: true
+
+  sensitive_data:
+    cir_path: "dataset.0.sensitive_data"
+    excel_cell: "B19"
+    required: true

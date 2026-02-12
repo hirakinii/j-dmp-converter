@@ -5,6 +5,7 @@
 ```
 dmps/
 ├── amed-dmp.xlsx : AMED の DMP 様式
+├── cfa-dmp.docx : CFA の DMP 様式
 ├── erca-dmp.xlsx : ERCA の DMP 様式
 ├── erca-metadata.xlsx : ERCA の Metadata 様式
 ├── jsps-dmp.xlsx : JSPS の DMP 様式
