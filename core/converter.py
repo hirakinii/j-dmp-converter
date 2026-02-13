@@ -9,7 +9,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from core.models import DMP, MissingField, ValidationResult
+from core.models import DMP, ValidationResult
 
 if TYPE_CHECKING:
     from adapters.readers.base import BaseReader

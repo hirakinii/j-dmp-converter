@@ -75,7 +75,7 @@ async def validate_dmp(dmp: DMP, target_format: str) -> ValidationResult:
     try:
         return converter.validate(dmp, target_format)
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e)) from e
 
 
 @app.post("/convert", response_model=None)
@@ -105,7 +105,7 @@ async def convert_file(
         dmp = converter.read(source_format, input_path)
         validation = converter.validate(dmp, target_format)
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e)) from e
 
     if not validation.is_complete:
         return JSONResponse(
@@ -144,7 +144,7 @@ async def convert_complete(
     try:
         validation = converter.validate(dmp, target_format)
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e)) from e
 
     if not validation.is_complete:
         raise HTTPException(
