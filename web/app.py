@@ -28,6 +28,12 @@ converter = ConversionService()
 _FILE_TYPE_SUFFIX: dict[str, str] = {
     "xlsx": ".xlsx",
     "docx": ".docx",
+    "json": ".json",
+}
+
+# Direct format-id to suffix mapping (for formats without a mapping definition)
+_FORMAT_SUFFIX: dict[str, str] = {
+    "cir": ".json",
 }
 
 
@@ -48,12 +54,14 @@ app = FastAPI(
 
 def _get_target_suffix(target_format: str) -> str:
     """Determine the output file suffix from the target format's writer mapping."""
+    if target_format in _FORMAT_SUFFIX:
+        return _FORMAT_SUFFIX[target_format]
     writer = converter._writers.get(target_format)
     if writer is None:
         return ".xlsx"
-    file_type = getattr(writer, "_mapping", None)
-    if file_type is not None:
-        return _FILE_TYPE_SUFFIX.get(file_type.file_type, ".xlsx")
+    mapping = getattr(writer, "_mapping", None)
+    if mapping is not None:
+        return _FILE_TYPE_SUFFIX.get(mapping.file_type, ".xlsx")
     return ".xlsx"
 
 
