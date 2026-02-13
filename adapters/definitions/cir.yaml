@@ -1,0 +1,588 @@
+# Common Intermediate Representation (CIR) definition
+# Describes the CIR data model based on the RDA DMP Common Standard (maDMP)
+# with Japan-specific extensions for e-Rad, J-Global, etc.
+#
+# Fields marked with "extension: true" are additions to the maDMP standard
+# for Japanese funding agency requirements.
+
+meta:
+  format_id: cir
+  format_name: "Common Intermediate Representation"
+  description: >
+    Hub schema used internally by j-dmp-converter.
+    Based on the RDA DMP Common Standard for machine-actionable DMPs (maDMP)
+    with extensions for Japanese funding agency requirements.
+  base_standard: "RDA DMP Common Standard (maDMP)"
+  python_module: "core.models"
+
+# ---------------------------------------------------------------------------
+# Enums
+# ---------------------------------------------------------------------------
+
+enums:
+  DataAccess:
+    description: "Data access level"
+    values: ["open", "shared", "closed"]
+
+  Booleanish:
+    description: "Three-valued enum representing yes / no / unknown"
+    values: ["yes", "no", "unknown"]
+
+  FundingStatus:
+    description: "Funding status of a grant"
+    values: ["planned", "applied", "granted", "rejected"]
+
+  Certification:
+    description: "Repository certification standard"
+    values:
+      - "din31644"
+      - "dini-zertifikat"
+      - "dsa"
+      - "iso16363"
+      - "iso16919"
+      - "trac"
+      - "wds"
+      - "coretrustseal"
+
+# ---------------------------------------------------------------------------
+# Models
+# ---------------------------------------------------------------------------
+
+models:
+  # --- Identifier models ---
+  TypedIdentifier:
+    description: "Generic typed identifier used across the schema"
+    fields:
+      identifier:
+        type: string
+        required: true
+      type:
+        type: string
+        required: true
+        description: "Identifier type (e.g. orcid, ror, doi, url, fundref)"
+
+  # --- Shared sub-models ---
+  Affiliation:
+    description: "Institutional affiliation of a person"
+    fields:
+      affiliation_id:
+        type: TypedIdentifier
+        required: false
+      name:
+        type: string
+        required: true
+        description: "Name of the institution"
+
+  Contact:
+    description: "Party that can provide information about the DMP"
+    fields:
+      contact_id:
+        type: TypedIdentifier | list[TypedIdentifier]
+        required: true
+        description: "Identifier(s) for the contact (e.g. ORCID)"
+      mbox:
+        type: email
+        required: true
+        description: "Contact email address"
+      name:
+        type: string
+        required: true
+        description: "Contact person's name"
+      affiliation:
+        type: list[Affiliation]
+        required: false
+        default: "[]"
+
+  Contributor:
+    description: "Contributor (researcher, etc.) associated with the DMP"
+    fields:
+      contributor_id:
+        type: TypedIdentifier | list[TypedIdentifier]
+        required: true
+        description: "Identifier(s) for the contributor (e.g. ORCID)"
+      name:
+        type: string
+        required: true
+      role:
+        type: list[string]
+        required: false
+        default: "[]"
+        description: "Roles per DataCite contributorType vocabulary"
+      mbox:
+        type: email
+        required: false
+      affiliation:
+        type: list[Affiliation]
+        required: false
+        default: "[]"
+      # Japan extensions
+      erad_researcher_id:
+        type: string
+        required: false
+        extension: true
+        description: "e-Rad researcher number (e-Rad研究者番号)"
+      institution_code:
+        type: string
+        required: false
+        extension: true
+        description: "Institutional code (所属機関コード)"
+
+  Creator:
+    description: "Creator of a dataset"
+    fields:
+      creator_id:
+        type: TypedIdentifier | list[TypedIdentifier]
+        required: true
+        description: "Identifier(s) for the creator (e.g. ORCID)"
+      name:
+        type: string
+        required: true
+      mbox:
+        type: email
+        required: false
+      affiliation:
+        type: list[Affiliation]
+        required: false
+        default: "[]"
+
+  AlternateIdentifier:
+    description: "Alternate identifier for a resource"
+    fields:
+      identifier:
+        type: string
+        required: true
+      type:
+        type: string
+        required: true
+        description: "Type of alternate identifier (e.g. accession number, doi)"
+
+  RelatedIdentifier:
+    description: "Identifier for a related resource"
+    fields:
+      identifier:
+        type: string
+        required: true
+      type:
+        type: string
+        required: true
+        description: "Identifier type per DataCite relatedIdentifierType"
+      relation_type:
+        type: string
+        required: true
+        description: "Relation type per DataCite relationType"
+      metadata_scheme:
+        type: string
+        required: false
+        description: "Name of the related metadata schema"
+      resource_type:
+        type: string
+        required: false
+        description: "Resource type per DataCite resourceTypeGeneral"
+      scheme_type:
+        type: string
+        required: false
+      scheme_uri:
+        type: string
+        required: false
+
+  # --- Cost ---
+  Cost:
+    description: "Cost item associated with the DMP"
+    fields:
+      title:
+        type: string
+        required: true
+      description:
+        type: string
+        required: false
+      value:
+        type: number
+        required: false
+      currency_code:
+        type: string
+        required: false
+        description: "ISO 4217 currency code"
+
+  # --- Funding / Project ---
+  FunderID:
+    description: "Identifier for a funding organization"
+    fields:
+      identifier:
+        type: string
+        required: true
+        description: "Funder ID, recommended CrossRef Funder Registry"
+      type:
+        type: string
+        required: true
+        description: "Identifier type (e.g. fundref, url)"
+
+  GrantID:
+    description: "Identifier for a grant"
+    fields:
+      identifier:
+        type: string
+        required: true
+      type:
+        type: string
+        required: true
+
+  Funding:
+    description: "Funding information for a project"
+    fields:
+      funder_id:
+        type: FunderID
+        required: true
+      funding_status:
+        type: FundingStatus
+        required: false
+        description: "Phase of project lifecycle (planned, applied, granted, rejected)"
+      grant_id:
+        type: GrantID
+        required: false
+
+  Project:
+    description: "Research project with Japan-specific extension fields"
+    fields:
+      title:
+        type: string
+        required: true
+      description:
+        type: string
+        required: false
+        description: "Project abstract"
+      start:
+        type: date
+        required: false
+        description: "Project start date (ISO 8601)"
+      end:
+        type: date
+        required: false
+        description: "Project end date (ISO 8601)"
+      funding:
+        type: list[Funding]
+        required: false
+        default: "[]"
+      project_id:
+        type: list[TypedIdentifier]
+        required: false
+        default: "[]"
+        description: "Project identifiers (e.g. doi, raid, url)"
+      # Japan extensions
+      erad_project_id:
+        type: string
+        required: false
+        extension: true
+        description: "e-Rad project ID (e-Rad課題ID)"
+      jglobal_id:
+        type: string
+        required: false
+        extension: true
+        description: "J-Global ID"
+
+  # --- Host / License / Distribution ---
+  Host:
+    description: "Data hosting destination such as a repository"
+    fields:
+      title:
+        type: string
+        required: true
+      url:
+        type: string
+        required: true
+        description: "URL of the hosting infrastructure"
+      description:
+        type: string
+        required: false
+      availability:
+        type: string
+        required: false
+        description: "Availability percentage of the host"
+      backup_frequency:
+        type: string
+        required: false
+      backup_type:
+        type: string
+        required: false
+      certified_with:
+        type: Certification
+        required: false
+        description: "Repository certification standard"
+      geo_location:
+        type: string
+        required: false
+        description: "ISO 3166-1 country code"
+      host_id:
+        type: list[TypedIdentifier]
+        required: false
+        default: "[]"
+      pid_system:
+        type: list[string]
+        required: false
+        default: "[]"
+        description: "PID systems (e.g. doi, handle, ark)"
+      storage_type:
+        type: string
+        required: false
+      support_versioning:
+        type: Booleanish
+        required: false
+
+  License:
+    description: "License applied to distributed data"
+    fields:
+      license_ref:
+        type: string
+        required: true
+        description: "URL to the license document"
+      start_date:
+        type: date
+        required: true
+        description: "Start date; future date indicates embargo period (ISO 8601)"
+
+  Distribution:
+    description: "Distribution form of a dataset"
+    fields:
+      title:
+        type: string
+        required: true
+      data_access:
+        type: DataAccess
+        required: true
+        description: "Access mode (open / shared / closed)"
+      access_url:
+        type: string
+        required: false
+        description: "Landing page URL"
+      available_until:
+        type: date
+        required: false
+        description: "Availability end date (ISO 8601)"
+      byte_size:
+        type: integer
+        required: false
+        description: "Size in bytes"
+      description:
+        type: string
+        required: false
+      download_url:
+        type: string
+        required: false
+        description: "Direct download URL"
+      format:
+        type: list[string]
+        required: false
+        default: "[]"
+        description: "MIME types or format names"
+      host:
+        type: Host
+        required: false
+      issued:
+        type: date
+        required: false
+        description: "Publication/release date (ISO 8601)"
+      license:
+        type: list[License]
+        required: false
+        default: "[]"
+
+  # --- Metadata / Security / Technical Resource ---
+  MetadataStandardID:
+    description: "Identifier for a metadata standard"
+    fields:
+      identifier:
+        type: string
+        required: true
+      type:
+        type: string
+        required: true
+
+  Metadata:
+    description: "Metadata associated with a dataset"
+    fields:
+      language:
+        type: string
+        required: true
+        description: "ISO 639-3 language code"
+      metadata_standard_id:
+        type: MetadataStandardID | list[MetadataStandardID]
+        required: true
+      description:
+        type: string
+        required: false
+
+  SecurityAndPrivacy:
+    description: "Security and privacy measures for data"
+    fields:
+      title:
+        type: string
+        required: true
+      description:
+        type: string
+        required: false
+
+  TechnicalResource:
+    description: "Technical resource associated with the DMP"
+    fields:
+      name:
+        type: string
+        required: true
+      description:
+        type: string
+        required: false
+      technical_resource_id:
+        type: list[TypedIdentifier]
+        required: false
+        default: "[]"
+
+  # --- Dataset ---
+  Dataset:
+    description: "Dataset managed within a DMP"
+    fields:
+      title:
+        type: string
+        required: true
+      dataset_id:
+        type: TypedIdentifier
+        required: true
+        description: "Dataset identifier (e.g. handle, doi, ark, url)"
+      personal_data:
+        type: Booleanish
+        required: true
+        description: "Whether the dataset contains personal data"
+      sensitive_data:
+        type: Booleanish
+        required: true
+        description: "Whether the dataset contains sensitive data"
+      description:
+        type: string
+        required: false
+      type:
+        type: string
+        required: false
+        description: "Dataset type per DataCite/COAR vocabulary"
+      issued:
+        type: date
+        required: false
+        description: "Publication/release date (ISO 8601)"
+      language:
+        type: string
+        required: false
+        description: "ISO 639-3 language code"
+      is_reused:
+        type: boolean
+        required: false
+        description: "Whether the dataset is reused from outside the project"
+      keyword:
+        type: list[string]
+        required: false
+        default: "[]"
+      alternate_identifier:
+        type: list[AlternateIdentifier]
+        required: false
+        default: "[]"
+      creator:
+        type: list[Creator]
+        required: false
+        default: "[]"
+      distribution:
+        type: list[Distribution]
+        required: false
+        default: "[]"
+      metadata:
+        type: list[Metadata]
+        required: false
+        default: "[]"
+      related_identifier:
+        type: list[RelatedIdentifier]
+        required: false
+        default: "[]"
+      security_and_privacy:
+        type: list[SecurityAndPrivacy]
+        required: false
+        default: "[]"
+      technical_resource:
+        type: list[TechnicalResource]
+        required: false
+        default: "[]"
+      data_quality_assurance:
+        type: list[string]
+        required: false
+        default: "[]"
+        description: "Quality assurance processes applied to the dataset"
+      preservation_statement:
+        type: string
+        required: false
+        description: "Plan for long-term preservation"
+      rights:
+        type: string
+        required: false
+        description: "Rights statement (copyright, etc.)"
+
+  # --- DMP (root) ---
+  DMP:
+    description: >
+      Root model for the Common Intermediate Representation (CIR).
+      Based on the RDA DMP Common Standard with Japanese extensions.
+    fields:
+      title:
+        type: string
+        required: true
+        description: "Title of the DMP"
+      dmp_id:
+        type: TypedIdentifier
+        required: true
+        description: "Identifier for the DMP itself (e.g. doi, url)"
+      created:
+        type: datetime
+        required: true
+        description: "Date/time of the first DMP version (ISO 8601 with timezone)"
+      modified:
+        type: datetime
+        required: true
+        description: "Date/time of the latest modification (ISO 8601 with timezone)"
+      language:
+        type: string
+        required: true
+        description: "ISO 639-3 language code"
+      ethical_issues_exist:
+        type: Booleanish
+        required: true
+        description: "Whether ethical issues exist"
+      contact:
+        type: Contact
+        required: true
+      dataset:
+        type: list[Dataset]
+        required: true
+        description: "At least one dataset is required"
+        min_items: 1
+      description:
+        type: string
+        required: false
+      ethical_issues_description:
+        type: string
+        required: false
+      ethical_issues_report:
+        type: string
+        required: false
+        description: "URL to ethical issues report"
+      contributor:
+        type: list[Contributor]
+        required: false
+        default: "[]"
+      cost:
+        type: list[Cost]
+        required: false
+        default: "[]"
+      project:
+        type: list[Project]
+        required: false
+        default: "[]"
+      alternate_identifier:
+        type: list[AlternateIdentifier]
+        required: false
+        default: "[]"
+      related_identifier:
+        type: list[RelatedIdentifier]
+        required: false
+        default: "[]"
