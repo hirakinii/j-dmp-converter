@@ -66,7 +66,7 @@ class ExcelWriter(BaseWriter):
         E.g. 'project.title' -> 'Our Project'
         """
         flat: dict[str, str | None] = {}
-        data = dmp.model_dump()
+        data = dmp.model_dump(mode="json")
         self._flatten_dict(data, "", flat)
         return flat
 

@@ -1,0 +1,55 @@
+# METI (経済産業省) DMP mapping definition
+# Maps CIR fields to METI Excel form cell coordinates.
+# Template sheet: 様式
+# Layout: Header rows (3-5) + data table (rows 9-18, columns B-J).
+
+meta:
+  format_id: meti
+  format_name: "METI データマネジメントプラン"
+  file_type: xlsx
+  template_sheet: "様式"
+
+mapping:
+  # --- Header ---
+  contract_date:
+    cir_path: "created"
+    excel_cell: "D4"
+    excel_sheet: "様式"
+    required: false
+
+  project_title:
+    cir_path: "project.0.title"
+    excel_cell: "D5"
+    excel_sheet: "様式"
+    required: true
+
+  # --- Data table (Row 9 = Data No.1) ---
+  dataset_title:
+    cir_path: "dataset.0.title"
+    excel_cell: "C9"
+    excel_sheet: "様式"
+    required: true
+
+  dataset_description:
+    cir_path: "dataset.0.description"
+    excel_cell: "D9"
+    excel_sheet: "様式"
+    required: true
+
+  data_management_institution:
+    cir_path: "contributor.0.affiliation.0.name"
+    excel_cell: "E9"
+    excel_sheet: "様式"
+    required: false
+
+  data_management_institution_code:
+    cir_path: "contributor.0.institution_code"
+    excel_cell: "F9"
+    excel_sheet: "様式"
+    required: false
+
+  data_access:
+    cir_path: "dataset.0.distribution.0.data_access"
+    excel_cell: "I9"
+    excel_sheet: "様式"
+    required: true
