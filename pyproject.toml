@@ -3,7 +3,8 @@ name = "j-dmp-converter"
 version = "0.1.0"
 description = "Japanese DMP format converter with Common Intermediate Representation (CIR)"
 readme = "README.md"
-license = "MIT"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
 requires-python = ">=3.11"
 dependencies = [
     "pydantic[email]>=2.0,<3.0",

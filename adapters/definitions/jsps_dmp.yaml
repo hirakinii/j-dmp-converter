@@ -1,93 +1,99 @@
 # JSPS (日本学術振興会) DMP mapping definition
 # Maps CIR fields to JSPS Excel form cell coordinates.
+# Template sheet: DMP様式例
+# Layout: Tabular format with sections for dates, project, personnel, and data.
 
 meta:
   format_id: jsps
   format_name: "JSPS データマネジメントプラン"
   file_type: xlsx
+  template_sheet: "DMP様式例"
 
 mapping:
-  project_title:
-    cir_path: "project.0.title"
+  # --- Section 1: DMP作成・更新情報 ---
+  creation_date:
+    cir_path: "created"
     excel_cell: "C5"
+    excel_sheet: "DMP様式例"
+    required: false
+
+  last_update_date:
+    cir_path: "modified"
+    excel_cell: "C6"
+    excel_sheet: "DMP様式例"
+    required: false
+
+  # --- Section 2: 研究課題情報 ---
+  erad_project_id:
+    cir_path: "project.0.erad_project_id"
+    excel_cell: "C9"
+    excel_sheet: "DMP様式例"
     required: true
 
+  # --- Section 3: 担当者情報 ---
   principal_investigator_name:
     cir_path: "contact.name"
-    excel_cell: "C3"
+    excel_cell: "D13"
+    excel_sheet: "DMP様式例"
     required: true
 
   principal_investigator_affiliation:
     cir_path: "contact.affiliation.0.name"
-    excel_cell: "C4"
-    required: true
-
-  erad_project_id:
-    cir_path: "project.0.erad_project_id"
-    excel_cell: "C6"
+    excel_cell: "E13"
+    excel_sheet: "DMP様式例"
     required: true
 
   erad_researcher_id:
     cir_path: "contributor.0.erad_researcher_id"
-    excel_cell: "C7"
+    excel_cell: "G13"
+    excel_sheet: "DMP様式例"
     required: true
 
-  project_start:
-    cir_path: "project.0.start"
-    excel_cell: "C8"
-    required: true
+  principal_investigator_contact:
+    cir_path: "contact.mbox"
+    excel_cell: "H13"
+    excel_sheet: "DMP様式例"
+    required: false
 
-  project_end:
-    cir_path: "project.0.end"
-    excel_cell: "C9"
-    required: true
-
+  # --- Section 4: 研究データ情報 (Row 22 = Data No.1) ---
   dataset_title:
     cir_path: "dataset.0.title"
-    excel_cell: "C12"
+    excel_cell: "B22"
+    excel_sheet: "DMP様式例"
     required: true
 
   dataset_description:
     cir_path: "dataset.0.description"
-    excel_cell: "C13"
+    excel_cell: "C22"
+    excel_sheet: "DMP様式例"
     required: true
 
-  data_type:
-    cir_path: "dataset.0.type"
-    excel_cell: "C14"
-    required: true
+  sensitive_data_policy:
+    cir_path: "dataset.0.security_and_privacy.0.description"
+    excel_cell: "F22"
+    excel_sheet: "DMP様式例"
+    required: false
 
   data_access:
     cir_path: "dataset.0.distribution.0.data_access"
-    excel_cell: "C15"
+    excel_cell: "G22"
+    excel_sheet: "DMP様式例"
+    required: true
+
+  data_access_details:
+    cir_path: "dataset.0.distribution.0.description"
+    excel_cell: "H22"
+    excel_sheet: "DMP様式例"
     required: true
 
   repository_url:
     cir_path: "dataset.0.distribution.0.host.url"
-    excel_cell: "C16"
+    excel_cell: "I22"
+    excel_sheet: "DMP様式例"
     required: false
 
-  data_format:
-    cir_path: "dataset.0.distribution.0.format.0"
-    excel_cell: "C17"
-    required: true
-
-  license:
-    cir_path: "dataset.0.distribution.0.license.0.license_ref"
-    excel_cell: "C18"
-    required: true
-
-  personal_data:
-    cir_path: "dataset.0.personal_data"
-    excel_cell: "C19"
-    required: true
-
-  sensitive_data:
-    cir_path: "dataset.0.sensitive_data"
-    excel_cell: "C20"
-    required: true
-
-  preservation_statement:
-    cir_path: "dataset.0.preservation_statement"
-    excel_cell: "C21"
-    required: true
+  publication_date:
+    cir_path: "dataset.0.issued"
+    excel_cell: "J22"
+    excel_sheet: "DMP様式例"
+    required: false
