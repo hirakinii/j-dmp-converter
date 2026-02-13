@@ -56,7 +56,8 @@ class ExcelReader(BaseReader):
 
         # Ensure required top-level fields have defaults
         nested.setdefault("title", nested.get("project", [{}])[0].get("title", "Untitled DMP"))
-        nested.setdefault("dmp_id", {"identifier": f"import-{self._mapping.format_id}", "type": "other"})
+        default_dmp_id = {"identifier": f"import-{self._mapping.format_id}", "type": "other"}
+        nested.setdefault("dmp_id", default_dmp_id)
         nested.setdefault("language", "jpn")
         nested.setdefault("ethical_issues_exist", "unknown")
 

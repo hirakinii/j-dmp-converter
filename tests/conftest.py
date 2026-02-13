@@ -7,6 +7,7 @@ from datetime import date, datetime, timezone
 import pytest
 
 from core.models import (
+    DMP,
     Affiliation,
     Booleanish,
     Contact,
@@ -14,7 +15,6 @@ from core.models import (
     DataAccess,
     Dataset,
     Distribution,
-    DMP,
     Host,
     License,
     Project,

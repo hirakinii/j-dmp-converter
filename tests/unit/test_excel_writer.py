@@ -9,7 +9,6 @@ from __future__ import annotations
 from pathlib import Path
 
 import openpyxl
-import pytest
 
 from adapters.mapping import load_mapping
 from adapters.writers.excel_writer import ExcelWriter

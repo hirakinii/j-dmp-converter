@@ -2,18 +2,18 @@
 
 from __future__ import annotations
 
-from datetime import date, datetime, timezone
+from datetime import datetime, timezone
 
 import pytest
 from pydantic import ValidationError
 
 from core.models import (
+    DMP,
     Booleanish,
     Contact,
     DataAccess,
     Dataset,
     Distribution,
-    DMP,
     MissingField,
     Project,
     TypedIdentifier,
