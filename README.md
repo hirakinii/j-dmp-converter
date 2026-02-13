@@ -8,6 +8,7 @@ AMED  (Excel) ─→ Reader ─→ CIR (JSON) ─→ Writer ─→ JSPS (Excel)
 JSPS  (Excel) ─→ Reader ─→ CIR (JSON) ─→ Writer ─→ METI (Excel)
 METI  (Excel) ─→ Reader ─→ CIR (JSON) ─→ Writer ─→ AMED (Excel)
 CFA   (Word)  ─→ Reader ─→ CIR (JSON) ─→ Writer ─→ CFA  (Word)
+CIR   (JSON)  ─→ Reader ─→ CIR (JSON) ─→ Writer ─→ CIR  (JSON)
 ```
 
 ## Features
@@ -21,12 +22,13 @@ CFA   (Word)  ─→ Reader ─→ CIR (JSON) ─→ Writer ─→ CFA  (Word)
 
 ## Supported Formats
 
-| Agency | File Format | Reader | Writer | Notes |
-|---|---|---|---|---|
-| AMED (Japan Agency for Medical Research and Development) | Excel (XLSX) | o | o | R7 version DMP format |
-| JSPS (Japan Society for the Promotion of Science) | Excel (XLSX) | o | o | Example KAKENHI DMP format |
-| METI (Ministry of Economy, Trade and Industry) | Excel (XLSX) | o | o | Contract Research DMP format |
-| CFA (Research Grant Program) | Word (DOCX) | o | o | CFA DMP format |
+| 機関 | ファイル形式 | Reader | Writer | 備考 |
+|------|-------------|--------|--------|------|
+| AMED（日本医療研究開発機構） | Excel (XLSX) | o | o | R7 版 DMP 様式 |
+| JSPS（日本学術振興会） | Excel (XLSX) | o | o | 科研費 DMP 様式例 |
+| METI（経済産業省） | Excel (XLSX) | o | o | 委託研究 DMP 様式 |
+| CFA（研究助成プログラム） | Word (DOCX) | o | o | CFA DMP 様式 |
+| CIR（共通中間表現） | JSON | o | o | CIR の直接読み書き |
 
 ## Quick Start
 
@@ -119,7 +121,10 @@ uv run python examples/basic_conversion.py tests/fixtures/filled_amed_sample.xls
 # AMED → CFA conversion (Excel → Word)
 uv run python examples/amed_to_cfa_conversion.py tests/fixtures/filled_amed_sample.xlsx
 
-# Batch conversion to multiple formats
+# AMED → CIR JSON → JSPS 変換（中間ファイル経由）
+uv run python examples/cir_json_conversion.py tests/fixtures/filled_amed_sample.xlsx
+
+# 複数形式への一括変換
 uv run python examples/multi_format_conversion.py tests/fixtures/filled_amed_sample.xlsx
 ```
 
@@ -141,18 +146,21 @@ j-dmp-converter/
 │   ├── readers/
 │   │   ├── base.py            # Reader Abstract Base Class
 │   │   ├── excel_reader.py    # Excel Reader
-│   │   └── docx_reader.py     # Word (DOCX) Reader
+│   │   ├── docx_reader.py     # Word (DOCX) Reader
+│   │   └── cir_json_reader.py # CIR JSON Reader
 │   └── writers/
 │       ├── base.py            # Writer Abstract Base Class
 │       ├── excel_writer.py    # Excel Writer
-│       └── docx_writer.py     # Word (DOCX) Writer
+│       ├── docx_writer.py     # Word (DOCX) Writer
+│       └── cir_json_writer.py # CIR JSON Writer
 ├── web/
 │   ├── app.py                 # FastAPI Application
 │   └── startup.py             # Batch Registration of Readers/Writers
 ├── examples/
-│   ├── basic_conversion.py    # Basic AMED → JSPS Conversion
-│   ├── amed_to_cfa_conversion.py  # Excel → Word Conversion
-│   └── multi_format_conversion.py # Batch Conversion to Multiple Formats
+│   ├── basic_conversion.py    # AMED → JSPS 基本変換
+│   ├── amed_to_cfa_conversion.py  # Excel → Word 変換
+│   ├── cir_json_conversion.py # CIR JSON 経由変換
+│   └── multi_format_conversion.py # 複数形式への一括変換
 ├── tests/
 │   ├── conftest.py            # Common Fixtures (sample_dmp)
 │   ├── fixtures/              # Sample Files for Testing
@@ -233,19 +241,21 @@ uv run pytest tests/unit/ -v
 uv run pytest tests/integration/ -v
 ```
 
-Current test results: **108 tests all PASS**
+現在のテスト結果: **121 テスト全 PASS**
 
-| Test File | Number of Tests | Contents |
-|---|---|---|
-| `test_models.py` | 12 | CIR schema validation, Japan extensions, JSON round trip |
-| `test_mapping.py` | 5 | YAML loader, AMED/JSPS/METI definitions |
-| `test_converter.py` | 6 | Conversion service registration, pipeline |
-| `test_excel_writer.py` | 13 | AMED/JSPS/METI cell injection, validation |
-| `test_excel_reader.py` | 35 | unflatten, DMP construction, AMED/JSPS/METI reading, round trip |
-| `test_docx_reader.py` | 11 | CFA Word reading, round trip |
-| `test_docx_writer.py` | 8 | CFA Word writing, validation |
-| `test_web_app.py` | 10 | Web API endpoints, conversion/validation |
-| `test_conversion.py` | 8 | AMED→JSPS/METI conversion, full pipeline via fixtures |
+| テストファイル | テスト数 | 内容 |
+|---------------|---------|------|
+| `test_models.py` | 12 | CIR スキーマバリデーション、日本拡張、JSON 往復 |
+| `test_mapping.py` | 5 | YAML ローダー、AMED/JSPS/METI 定義 |
+| `test_converter.py` | 6 | 変換サービス登録、パイプライン |
+| `test_excel_writer.py` | 13 | AMED/JSPS/METI セル注入、バリデーション |
+| `test_excel_reader.py` | 35 | unflatten、DMP 構築、AMED/JSPS/METI 読み込み、ラウンドトリップ |
+| `test_docx_reader.py` | 11 | CFA Word 読み込み、ラウンドトリップ |
+| `test_docx_writer.py` | 8 | CFA Word 書き出し、バリデーション |
+| `test_cir_json_reader.py` | 5 | CIR JSON 読み込み、ラウンドトリップ、エラーハンドリング |
+| `test_cir_json_writer.py` | 5 | CIR JSON 書き出し、ラウンドトリップ、UTF-8、バリデーション |
+| `test_web_app.py` | 13 | Web API エンドポイント、変換・バリデーション、CIR JSON 変換 |
+| `test_conversion.py` | 8 | AMED→JSPS/METI 変換、フィクスチャ経由フルパイプライン |
 
 ## Development Roadmap
 

@@ -9,8 +9,10 @@ from __future__ import annotations
 from pathlib import Path
 
 from adapters.mapping import load_mapping
+from adapters.readers.cir_json_reader import CirJsonReader
 from adapters.readers.docx_reader import DocxReader
 from adapters.readers.excel_reader import ExcelReader
+from adapters.writers.cir_json_writer import CirJsonWriter
 from adapters.writers.docx_writer import DocxWriter
 from adapters.writers.excel_writer import ExcelWriter
 from core.converter import ConversionService
@@ -45,3 +47,7 @@ def register_all(converter: ConversionService) -> None:
                 format_id,
                 DocxWriter(mapping=mapping, template_path=template_path),
             )
+
+    # CIR JSON format (no mapping/template needed)
+    converter.register_reader("cir", CirJsonReader())
+    converter.register_writer("cir", CirJsonWriter())

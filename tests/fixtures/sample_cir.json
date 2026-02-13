@@ -1,0 +1,127 @@
+{
+  "title": "テスト用データマネジメントプラン",
+  "dmp_id": {
+    "identifier": "https://example.org/dmp/001",
+    "type": "url"
+  },
+  "created": "2026-04-01T00:00:00Z",
+  "modified": "2026-04-01T00:00:00Z",
+  "language": "jpn",
+  "ethical_issues_exist": "no",
+  "contact": {
+    "contact_id": {
+      "identifier": "0000-0001-2345-6789",
+      "type": "orcid"
+    },
+    "mbox": "yamada@example.ac.jp",
+    "name": "山田太郎",
+    "affiliation": [
+      {
+        "affiliation_id": {
+          "identifier": "1234567890",
+          "type": "ror"
+        },
+        "name": "東京大学"
+      }
+    ]
+  },
+  "dataset": [
+    {
+      "title": "実験データセット",
+      "dataset_id": {
+        "identifier": "https://example.org/dataset/001",
+        "type": "url"
+      },
+      "personal_data": "no",
+      "sensitive_data": "no",
+      "description": "サンプル実験データ",
+      "type": "dataset",
+      "issued": null,
+      "language": "jpn",
+      "is_reused": null,
+      "keyword": [
+        "テスト",
+        "サンプル"
+      ],
+      "alternate_identifier": [],
+      "creator": [],
+      "distribution": [
+        {
+          "title": "実験データ配布",
+          "data_access": "open",
+          "access_url": null,
+          "available_until": null,
+          "byte_size": null,
+          "description": null,
+          "download_url": null,
+          "format": [
+            "text/csv"
+          ],
+          "host": {
+            "title": "機関リポジトリ",
+            "url": "https://repository.example.ac.jp",
+            "description": null,
+            "availability": null,
+            "backup_frequency": null,
+            "backup_type": null,
+            "certified_with": null,
+            "geo_location": null,
+            "host_id": [],
+            "pid_system": [],
+            "storage_type": null,
+            "support_versioning": null
+          },
+          "issued": null,
+          "license": [
+            {
+              "license_ref": "https://creativecommons.org/licenses/by/4.0/",
+              "start_date": "2029-04-01"
+            }
+          ]
+        }
+      ],
+      "metadata": [],
+      "related_identifier": [],
+      "security_and_privacy": [],
+      "technical_resource": [],
+      "data_quality_assurance": [],
+      "preservation_statement": null,
+      "rights": null
+    }
+  ],
+  "description": null,
+  "ethical_issues_description": null,
+  "ethical_issues_report": null,
+  "contributor": [
+    {
+      "contributor_id": {
+        "identifier": "0000-0001-2345-6789",
+        "type": "orcid"
+      },
+      "name": "山田太郎",
+      "role": [
+        "DataManager",
+        "Researcher"
+      ],
+      "mbox": null,
+      "affiliation": [],
+      "erad_researcher_id": "12345678",
+      "institution_code": null
+    }
+  ],
+  "cost": [],
+  "project": [
+    {
+      "title": "サンプル研究プロジェクト",
+      "description": "データマネジメントプランのコンバーターに関する研究",
+      "start": "2026-04-01",
+      "end": "2029-03-31",
+      "funding": [],
+      "project_id": [],
+      "erad_project_id": "JP26000001",
+      "jglobal_id": null
+    }
+  ],
+  "alternate_identifier": [],
+  "related_identifier": []
+}
