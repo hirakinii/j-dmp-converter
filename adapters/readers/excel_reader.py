@@ -20,6 +20,11 @@ class ExcelReader(BaseReader):
     """Reads data from an Excel file based on a mapping definition."""
 
     def __init__(self, mapping: MappingDefinition) -> None:
+        """Initialize the ExcelReader.
+
+        Args:
+            mapping: Mapping definition linking cell coordinates to CIR fields.
+        """
         self._mapping = mapping
 
     def read(self, input_path: Path) -> DMP:

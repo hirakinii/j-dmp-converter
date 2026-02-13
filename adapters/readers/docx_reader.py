@@ -22,11 +22,16 @@ class DocxReader(BaseReader):
     """Reads data from a Word file based on table coordinates in the mapping."""
 
     def __init__(self, mapping: MappingDefinition) -> None:
+        """Initialize the DocxReader.
+
+        Args:
+            mapping: Mapping definition linking table coordinates to CIR fields.
+        """
         self._mapping = mapping
 
     def read(self, input_path: Path) -> DMP:
         """Read a Word file and return the CIR representation."""
-        doc = Document(input_path)
+        doc = Document(input_path.as_posix())
         tables = doc.tables
         raw: dict[str, str | None] = {}
 

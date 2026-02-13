@@ -35,15 +35,29 @@ class ConversionService:
     # -- Registry ----------------------------------------------------------
 
     def register_reader(self, format_id: str, reader: BaseReader) -> None:
+        """Register a reader for the given format.
+
+        Args:
+            format_id: Format identifier string (e.g. "amed").
+            reader: BaseReader implementation to register.
+        """
         self._readers[format_id] = reader
 
     def register_writer(self, format_id: str, writer: BaseWriter) -> None:
+        """Register a writer for the given format.
+
+        Args:
+            format_id: Format identifier string (e.g. "jsps").
+            writer: BaseWriter implementation to register.
+        """
         self._writers[format_id] = writer
 
     def available_readers(self) -> list[str]:
+        """Return a list of registered reader format IDs."""
         return list(self._readers.keys())
 
     def available_writers(self) -> list[str]:
+        """Return a list of registered writer format IDs."""
         return list(self._writers.keys())
 
     # -- Pipeline ----------------------------------------------------------

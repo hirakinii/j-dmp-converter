@@ -18,18 +18,24 @@ from pydantic import BaseModel, EmailStr, Field
 
 
 class DataAccess(str, enum.Enum):
+    """Data access level (open / shared / closed)."""
+
     OPEN = "open"
     SHARED = "shared"
     CLOSED = "closed"
 
 
 class Booleanish(str, enum.Enum):
+    """Three-valued enum representing yes / no / unknown."""
+
     YES = "yes"
     NO = "no"
     UNKNOWN = "unknown"
 
 
 class FundingStatus(str, enum.Enum):
+    """Funding status of a grant."""
+
     PLANNED = "planned"
     APPLIED = "applied"
     GRANTED = "granted"
@@ -37,6 +43,8 @@ class FundingStatus(str, enum.Enum):
 
 
 class Certification(str, enum.Enum):
+    """Repository certification standard."""
+
     DIN31644 = "din31644"
     DINI_ZERTIFIKAT = "dini-zertifikat"
     DSA = "dsa"
@@ -65,6 +73,8 @@ class TypedIdentifier(BaseModel):
 
 
 class Affiliation(BaseModel):
+    """Institutional affiliation of a person."""
+
     affiliation_id: TypedIdentifier | None = None
     name: str
 
@@ -79,6 +89,8 @@ class Contact(BaseModel):
 
 
 class Contributor(BaseModel):
+    """Contributor (researcher, etc.) associated with the DMP."""
+
     contributor_id: TypedIdentifier | list[TypedIdentifier]
     name: str
     role: list[str] = Field(default_factory=list)
@@ -95,6 +107,8 @@ class Contributor(BaseModel):
 
 
 class Creator(BaseModel):
+    """Creator of a dataset."""
+
     creator_id: TypedIdentifier | list[TypedIdentifier]
     name: str
     mbox: EmailStr | None = None
@@ -102,11 +116,15 @@ class Creator(BaseModel):
 
 
 class AlternateIdentifier(BaseModel):
+    """Alternate identifier for a resource."""
+
     identifier: str
     type: str
 
 
 class RelatedIdentifier(BaseModel):
+    """Identifier for a related resource."""
+
     identifier: str
     type: str
     relation_type: str
@@ -122,6 +140,8 @@ class RelatedIdentifier(BaseModel):
 
 
 class Cost(BaseModel):
+    """Cost item associated with the DMP."""
+
     title: str
     description: str | None = None
     value: float | None = None
@@ -134,22 +154,30 @@ class Cost(BaseModel):
 
 
 class FunderID(BaseModel):
+    """Identifier for a funding organization."""
+
     identifier: str
     type: str
 
 
 class GrantID(BaseModel):
+    """Identifier for a grant."""
+
     identifier: str
     type: str
 
 
 class Funding(BaseModel):
+    """Funding information for a project."""
+
     funder_id: FunderID
     funding_status: FundingStatus | None = None
     grant_id: GrantID | None = None
 
 
 class Project(BaseModel):
+    """Research project with Japan-specific extension fields."""
+
     title: str
     description: str | None = None
     start: date | None = None
@@ -172,6 +200,8 @@ class Project(BaseModel):
 
 
 class Host(BaseModel):
+    """Data hosting destination such as a repository."""
+
     title: str
     url: str
     description: str | None = None
@@ -187,11 +217,15 @@ class Host(BaseModel):
 
 
 class License(BaseModel):
+    """License applied to distributed data."""
+
     license_ref: str
     start_date: date
 
 
 class Distribution(BaseModel):
+    """Distribution form of a dataset."""
+
     title: str
     data_access: DataAccess
     access_url: str | None = None
@@ -211,22 +245,30 @@ class Distribution(BaseModel):
 
 
 class MetadataStandardID(BaseModel):
+    """Identifier for a metadata standard."""
+
     identifier: str
     type: str
 
 
 class Metadata(BaseModel):
+    """Metadata associated with a dataset."""
+
     language: str = Field(description="ISO 639-3 language code")
     metadata_standard_id: MetadataStandardID | list[MetadataStandardID]
     description: str | None = None
 
 
 class SecurityAndPrivacy(BaseModel):
+    """Security and privacy measures for data."""
+
     title: str
     description: str | None = None
 
 
 class TechnicalResource(BaseModel):
+    """Technical resource associated with the DMP."""
+
     name: str
     description: str | None = None
     technical_resource_id: list[TypedIdentifier] = Field(default_factory=list)
@@ -238,6 +280,8 @@ class TechnicalResource(BaseModel):
 
 
 class Dataset(BaseModel):
+    """Dataset managed within a DMP."""
+
     title: str
     dataset_id: TypedIdentifier
     personal_data: Booleanish

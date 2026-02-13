@@ -19,6 +19,12 @@ class ExcelWriter(BaseWriter):
     """Writes CIR data into an Excel template file."""
 
     def __init__(self, mapping: MappingDefinition, template_path: Path) -> None:
+        """Initialize the ExcelWriter.
+
+        Args:
+            mapping: Mapping definition linking cell coordinates to CIR fields.
+            template_path: Path to the Excel template file.
+        """
         self._mapping = mapping
         self._template_path = template_path
 
@@ -73,6 +79,13 @@ class ExcelWriter(BaseWriter):
     def _flatten_dict(
         self, obj: dict | list | object, prefix: str, result: dict[str, str | None]
     ) -> None:
+        """Recursively flatten a nested dict/list structure.
+
+        Args:
+            obj: Object to flatten.
+            prefix: Current dot-path prefix.
+            result: Dict to store flattened key-value pairs.
+        """
         if isinstance(obj, dict):
             for key, value in obj.items():
                 new_key = f"{prefix}.{key}" if prefix else key
