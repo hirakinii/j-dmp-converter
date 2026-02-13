@@ -1,7 +1,7 @@
 # J DMP Converter
 
-国内の研究助成機関（AMED, JSPS, METI 等）が要求するデータマネジメントプラン（DMP）様式間の変換ツールです。
-**共通中間表現（CIR: Common Intermediate Representation）** を経由するハブ＆スポーク型アーキテクチャにより、様式の追加・変更に柔軟に対応します。
+This tool facilitates conversion between Data Management Plan (DMP) formats required by various Japanese research funding agencies (e.g., AMED, JSPS, METI).
+It employs a hub-and-spoke architecture via a **Common Intermediate Representation (CIR: Common Intermediate Representation)**, allowing for flexible adaptation to changes and additions in formats.
 
 ```
 AMED  (Excel) ─→ Reader ─→ CIR (JSON) ─→ Writer ─→ JSPS (Excel)
@@ -10,32 +10,32 @@ METI  (Excel) ─→ Reader ─→ CIR (JSON) ─→ Writer ─→ AMED (Excel)
 CFA   (Word)  ─→ Reader ─→ CIR (JSON) ─→ Writer ─→ CFA  (Word)
 ```
 
-## 特徴
+## Features
 
-- **ハブ＆スポーク変換** — 機関同士の直接変換ではなく CIR を経由するため、N 機関の対応に必要なアダプタは N 個（N×N ではない）
-- **テンプレート注入方式** — 各機関の公式 Excel/Word 様式をそのままテンプレートとして使用し、セル座標・テンプレートタグへの値注入のみを行うため、様式変更への追従が容易
-- **マッピング定義の外部化** — セル座標／テーブル座標と CIR フィールドの対応を YAML で管理。コード変更なしに様式レイアウトの変更に対応可能
-- **ギャップ分析** — 変換元にない項目を自動検出し、不足フィールドのリストを返却
-- **Web API** — FastAPI による REST API を提供。ファイルアップロード・変換・不足項目補完フローに対応
-- **RDA DMP Common Standard 準拠** — CIR は国際標準 maDMP をベースに、e-Rad 課題 ID 等の日本独自フィールドを拡張
+- **Hub-and-Spoke Conversion** — Instead of direct conversion between agencies, all conversions go through CIR. This means only N adapters are needed for N agencies (not N×N).
+- **Template Injection Method** — Official Excel/Word formats from each agency are used directly as templates. Values are injected only into cell coordinates and template tags, making it easy to adapt to format changes.
+- **Externalization of Mapping Definitions** — Correspondence between cell/table coordinates and CIR fields is managed in YAML. This allows adapting to changes in format layouts without code modification.
+- **Gap Analysis** — Automatically detects items not present in the source format and returns a list of missing fields.
+- **Web API** — Provides a REST API using FastAPI, supporting file upload, conversion, and missing item supplementation flows.
+- **RDA DMP Common Standard Compliance** — CIR is based on the international standard maDMP, with extensions for Japan-specific fields like e-Rad project IDs.
 
-## 対応様式
+## Supported Formats
 
-| 機関 | ファイル形式 | Reader | Writer | 備考 |
-|------|-------------|--------|--------|------|
-| AMED（日本医療研究開発機構） | Excel (XLSX) | o | o | R7 版 DMP 様式 |
-| JSPS（日本学術振興会） | Excel (XLSX) | o | o | 科研費 DMP 様式例 |
-| METI（経済産業省） | Excel (XLSX) | o | o | 委託研究 DMP 様式 |
-| CFA（研究助成プログラム） | Word (DOCX) | o | o | CFA DMP 様式 |
+| Agency | File Format | Reader | Writer | Notes |
+|---|---|---|---|---|
+| AMED (Japan Agency for Medical Research and Development) | Excel (XLSX) | o | o | R7 version DMP format |
+| JSPS (Japan Society for the Promotion of Science) | Excel (XLSX) | o | o | Example KAKENHI DMP format |
+| METI (Ministry of Economy, Trade and Industry) | Excel (XLSX) | o | o | Contract Research DMP format |
+| CFA (Research Grant Program) | Word (DOCX) | o | o | CFA DMP format |
 
-## クイックスタート
+## Quick Start
 
-### 必要環境
+### Prerequisites
 
 - Python >= 3.11
-- [uv](https://docs.astral.sh/uv/) (パッケージマネージャー)
+- [uv](https://docs.astral.sh/uv/) (package manager)
 
-### インストール
+### Installation
 
 ```bash
 git clone https://github.com/your-org/j-dmp-converter.git
@@ -43,7 +43,7 @@ cd j-dmp-converter
 uv sync
 ```
 
-### 使い方（Python API）
+### Usage (Python API)
 
 ```python
 from pathlib import Path
@@ -52,10 +52,10 @@ from adapters.readers.excel_reader import ExcelReader
 from adapters.writers.excel_writer import ExcelWriter
 from core.converter import ConversionService
 
-# サービスの構築
+# Build the service
 service = ConversionService()
 
-# AMED アダプタの登録
+# Register AMED adapter
 amed_mapping = load_mapping(Path("adapters/definitions/amed_dmp.yaml"))
 service.register_reader("amed", ExcelReader(mapping=amed_mapping))
 service.register_writer(
@@ -63,116 +63,116 @@ service.register_writer(
     ExcelWriter(mapping=amed_mapping, template_path=Path("adapters/templates/amed_template.xlsx")),
 )
 
-# JSPS アダプタの登録
+# Register JSPS adapter
 jsps_mapping = load_mapping(Path("adapters/definitions/jsps_dmp.yaml"))
 service.register_writer(
     "jsps",
     ExcelWriter(mapping=jsps_mapping, template_path=Path("adapters/templates/jsps_template.xlsx")),
 )
 
-# AMED → CIR → JSPS 変換
+# AMED → CIR → JSPS Conversion
 cir = service.read("amed", Path("input_amed.xlsx"))
 result = service.validate(cir, "jsps")
 
 if result.is_complete:
     service.write(cir, "jsps", Path("output_jsps.xlsx"))
 else:
-    print("不足項目:")
+    print("Missing items:")
     for field in result.missing_fields:
         print(f"  - {field.field_label} ({field.field_path})")
 ```
 
-### 使い方（Web API）
+### Usage (Web API)
 
 ```bash
-# サーバー起動
+# Start server
 uv run uvicorn web.app:app --reload
 
-# 利用可能な様式一覧
+# List available formats
 curl http://localhost:8000/formats
 
-# AMED → JSPS 変換（ファイルアップロード）
-curl -X POST "http://localhost:8000/convert?source_format=amed&target_format=jsps" \
-  -F "file=@input_amed.xlsx" \
+# AMED → JSPS conversion (file upload)
+curl -X POST "http://localhost:8000/convert?source_format=amed&target_format=jsps" 
+  -F "file=@input_amed.xlsx" 
   -o output_jsps.xlsx
 
-# ギャップ分析
-curl -X POST "http://localhost:8000/validate?target_format=jsps" \
-  -H "Content-Type: application/json" \
+# Gap analysis
+curl -X POST "http://localhost:8000/validate?target_format=jsps" 
+  -H "Content-Type: application/json" 
   -d @cir.json
 
-# 不足項目補完後の変換完了
-curl -X POST "http://localhost:8000/convert/complete?target_format=jsps" \
-  -H "Content-Type: application/json" \
-  -d @supplemented_cir.json \
+# Conversion complete after supplementing missing items
+curl -X POST "http://localhost:8000/convert/complete?target_format=jsps" 
+  -H "Content-Type: application/json" 
+  -d @supplemented_cir.json 
   -o output_jsps.xlsx
 ```
 
-### サンプルスクリプト
+### Sample Scripts
 
-`examples/` ディレクトリにサンプルスクリプトを用意しています。
+Sample scripts are available in the `examples/` directory.
 
 ```bash
-# AMED → JSPS 基本変換
+# Basic AMED → JSPS conversion
 uv run python examples/basic_conversion.py tests/fixtures/filled_amed_sample.xlsx
 
-# AMED → CFA 変換（Excel → Word）
+# AMED → CFA conversion (Excel → Word)
 uv run python examples/amed_to_cfa_conversion.py tests/fixtures/filled_amed_sample.xlsx
 
-# 複数形式への一括変換
+# Batch conversion to multiple formats
 uv run python examples/multi_format_conversion.py tests/fixtures/filled_amed_sample.xlsx
 ```
 
-## プロジェクト構成
+## Project Structure
 
 ```
 j-dmp-converter/
 ├── core/
-│   ├── models.py              # CIR データモデル (Pydantic)
-│   └── converter.py           # 変換パイプライン統括
+│   ├── models.py              # CIR Data Model (Pydantic)
+│   └── converter.py           # Conversion Pipeline Management
 ├── adapters/
-│   ├── mapping.py             # YAML マッピング定義ローダー
-│   ├── definitions/           # 各機関のマッピング定義
+│   ├── mapping.py             # YAML Mapping Definition Loader
+│   ├── definitions/           # Mapping Definitions for Each Agency
 │   │   ├── amed_dmp.yaml
 │   │   ├── jsps_dmp.yaml
 │   │   ├── meti_dmp.yaml
 │   │   └── cfa_dmp.yaml
-│   ├── templates/             # 各機関の様式テンプレート (XLSX/DOCX)
+│   ├── templates/             # Format Templates for Each Agency (XLSX/DOCX)
 │   ├── readers/
-│   │   ├── base.py            # Reader 抽象基底クラス
+│   │   ├── base.py            # Reader Abstract Base Class
 │   │   ├── excel_reader.py    # Excel Reader
 │   │   └── docx_reader.py     # Word (DOCX) Reader
 │   └── writers/
-│       ├── base.py            # Writer 抽象基底クラス
+│       ├── base.py            # Writer Abstract Base Class
 │       ├── excel_writer.py    # Excel Writer
 │       └── docx_writer.py     # Word (DOCX) Writer
 ├── web/
-│   ├── app.py                 # FastAPI アプリケーション
-│   └── startup.py             # Reader/Writer 一括登録
+│   ├── app.py                 # FastAPI Application
+│   └── startup.py             # Batch Registration of Readers/Writers
 ├── examples/
-│   ├── basic_conversion.py    # AMED → JSPS 基本変換
-│   ├── amed_to_cfa_conversion.py  # Excel → Word 変換
-│   └── multi_format_conversion.py # 複数形式への一括変換
+│   ├── basic_conversion.py    # Basic AMED → JSPS Conversion
+│   ├── amed_to_cfa_conversion.py  # Excel → Word Conversion
+│   └── multi_format_conversion.py # Batch Conversion to Multiple Formats
 ├── tests/
-│   ├── conftest.py            # 共通フィクスチャ (sample_dmp)
-│   ├── fixtures/              # テスト用サンプルファイル
-│   ├── unit/                  # 単体テスト
-│   └── integration/           # 結合テスト
+│   ├── conftest.py            # Common Fixtures (sample_dmp)
+│   ├── fixtures/              # Sample Files for Testing
+│   ├── unit/                  # Unit Tests
+│   └── integration/           # Integration Tests
 └── docs/
-    ├── specifications.md      # ソフトウェア仕様書
-    ├── dmps/                  # 各機関の DMP 実ファイル（参考資料）
-    └── plans/                 # 実装計画・開発戦略
+    ├── specifications.md      # Software Specifications
+    ├── dmps/                  # Actual DMP files for Each Agency (Reference)
+    └── plans/                 # Implementation Plan / Development Strategy
 ```
 
-## マッピング定義
+## Mapping Definitions
 
-各機関の様式と CIR の対応は YAML ファイルで定義します。新しい機関を追加する際は、YAML 定義とテンプレートファイルを追加するだけで対応できます。
+The correspondence between each agency's format and CIR is defined in YAML files. To add a new agency, you only need to add a YAML definition and a template file.
 
 ```yaml
-# adapters/definitions/amed_dmp.yaml (抜粋)
+# adapters/definitions/amed_dmp.yaml (excerpt)
 meta:
   format_id: amed
-  format_name: "AMED データマネジメントプラン"
+  format_name: "AMED Data Management Plan"
   file_type: xlsx
   template_sheet: "DMP様式"
 
@@ -190,84 +190,84 @@ mapping:
     required: true
 ```
 
-## CIR データモデル
+## CIR Data Model
 
-CIR は [RDA DMP Common Standard (maDMP)](https://github.com/RDA-DMP-Common/RDA-DMP-Common-Standard) をベースとした Pydantic モデルです。
+CIR is a Pydantic model based on the [RDA DMP Common Standard (maDMP)](https://github.com/RDA-DMP-Common/RDA-DMP-Common-Standard).
 
-| モデル | 説明 |
-|--------|------|
-| `DMP` | ルートモデル（タイトル、連絡先、データセット等） |
-| `Project` | 研究課題情報（課題名、期間、e-Rad 課題 ID） |
-| `Contact` | DMP 連絡先（氏名、メール、所属） |
-| `Contributor` | 研究参加者（e-Rad 研究者番号、所属機関コード） |
-| `Dataset` | データセット（タイトル、種別、個人情報・機微情報の有無） |
-| `Distribution` | 配布・保存情報（アクセス権、リポジトリ、ライセンス） |
+| Model | Description |
+|---|---|
+| `DMP` | Root model (title, contact, datasets, etc.) |
+| `Project` | Research project information (project name, period, e-Rad project ID) |
+| `Contact` | DMP contact (name, email, affiliation) |
+| `Contributor` | Research participant (e-Rad researcher number, affiliation code) |
+| `Dataset` | Dataset (title, type, presence of personal/sensitive information) |
+| `Distribution` | Distribution/Storage information (access rights, repository, license) |
 
 ## Web API
 
-FastAPI ベースの REST API を提供します。
+Provides a FastAPI-based REST API.
 
-| エンドポイント | メソッド | 説明 |
-|---------------|---------|------|
-| `/formats` | GET | 利用可能な入出力様式一覧を取得 |
-| `/convert` | POST | ファイルアップロードによる様式変換 |
-| `/convert/complete` | POST | 不足項目補完後の変換完了（2 ステップ変換） |
-| `/validate` | POST | CIR データのギャップ分析 |
+| Endpoint | Method | Description |
+|---|---|---|
+| `/formats` | GET | Get a list of available input/output formats |
+| `/convert` | POST | Convert format via file upload |
+| `/convert/complete` | POST | Complete conversion after supplementing missing items (2-step conversion) |
+| `/validate` | POST | Gap analysis of CIR data |
 
-不足項目がある場合の変換フロー:
+Conversion flow when there are missing items:
 
-1. `/convert` にファイルをアップロード → 422 レスポンスで不足項目と CIR を返却
-2. クライアントが CIR の不足項目を補完
-3. `/convert/complete` に補完済み CIR を送信 → 変換結果ファイルを返却
+1. Upload file to `/convert` → Returns 422 response with missing items and CIR
+2. Client supplements missing items in CIR
+3. Send supplemented CIR to `/convert/complete` → Returns converted file
 
-## テスト
+## Tests
 
 ```bash
-# 全テスト実行
+# Run all tests
 uv run pytest
 
-# 単体テストのみ
+# Unit tests only
 uv run pytest tests/unit/ -v
 
-# 結合テストのみ
+# Integration tests only
 uv run pytest tests/integration/ -v
 ```
 
-現在のテスト結果: **108 テスト全 PASS**
+Current test results: **108 tests all PASS**
 
-| テストファイル | テスト数 | 内容 |
-|---------------|---------|------|
-| `test_models.py` | 12 | CIR スキーマバリデーション、日本拡張、JSON 往復 |
-| `test_mapping.py` | 5 | YAML ローダー、AMED/JSPS/METI 定義 |
-| `test_converter.py` | 6 | 変換サービス登録、パイプライン |
-| `test_excel_writer.py` | 13 | AMED/JSPS/METI セル注入、バリデーション |
-| `test_excel_reader.py` | 35 | unflatten、DMP 構築、AMED/JSPS/METI 読み込み、ラウンドトリップ |
-| `test_docx_reader.py` | 11 | CFA Word 読み込み、ラウンドトリップ |
-| `test_docx_writer.py` | 8 | CFA Word 書き出し、バリデーション |
-| `test_web_app.py` | 10 | Web API エンドポイント、変換・バリデーション |
-| `test_conversion.py` | 8 | AMED→JSPS/METI 変換、フィクスチャ経由フルパイプライン |
+| Test File | Number of Tests | Contents |
+|---|---|---|
+| `test_models.py` | 12 | CIR schema validation, Japan extensions, JSON round trip |
+| `test_mapping.py` | 5 | YAML loader, AMED/JSPS/METI definitions |
+| `test_converter.py` | 6 | Conversion service registration, pipeline |
+| `test_excel_writer.py` | 13 | AMED/JSPS/METI cell injection, validation |
+| `test_excel_reader.py` | 35 | unflatten, DMP construction, AMED/JSPS/METI reading, round trip |
+| `test_docx_reader.py` | 11 | CFA Word reading, round trip |
+| `test_docx_writer.py` | 8 | CFA Word writing, validation |
+| `test_web_app.py` | 10 | Web API endpoints, conversion/validation |
+| `test_conversion.py` | 8 | AMED→JSPS/METI conversion, full pipeline via fixtures |
 
-## 開発ロードマップ
+## Development Roadmap
 
-| フェーズ | 状態 | 目標 |
-|---------|------|------|
-| **Phase 1: MVP** | **完了** | CIR 定義、Excel Writer/Reader、3 機関対応 |
-| Phase 2: Reader 充実 | 計画中 | 表記ゆれ吸収、追加機関対応 |
-| **Phase 3: Word 対応** | **完了** | DOCX Reader/Writer（CFA） |
-| **Phase 4: Web UI** | **進行中** | FastAPI REST API、不足項目補完フロー |
+| Phase | Status | Goal |
+|---|---|---|
+| **Phase 1: MVP** | **Completed** | CIR definition, Excel Writer/Reader, 3 agency support |
+| Phase 2: Enhanced Reader | Planned | Absorb notation variations, support additional agencies |
+| **Phase 3: Word Support** | **Completed** | DOCX Reader/Writer (CFA) |
+| **Phase 4: Web UI** | **In Progress** | FastAPI REST API, missing item supplementation flow |
 
-## 技術スタック
+## Tech Stack
 
-| 用途 | パッケージ |
-|------|-----------|
-| データモデル | `pydantic` |
-| Excel 操作 | `openpyxl` |
-| Word 操作 | `python-docx` / `docxtpl` |
-| マッピング定義 | `pyyaml` |
+| Purpose | Package |
+|---|---|
+| Data Model | `pydantic` |
+| Excel Operations | `openpyxl` |
+| Word Operations | `python-docx` / `docxtpl` |
+| Mapping Definitions | `pyyaml` |
 | Web API | `fastapi` / `uvicorn` |
-| テスト | `pytest` / `pytest-cov` |
-| リンター | `ruff` |
+| Testing | `pytest` / `pytest-cov` |
+| Linter | `ruff` |
 
-## ライセンス
+## License
 
 Apache-2.0. See [LICENSE](./LICENSE) for details.
