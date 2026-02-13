@@ -6,6 +6,7 @@
 ## Rules
 
 * 開発スタイルは Test-Driven Development（TDD）を遵守してください。
+* コード内で docstring や JSDoc は必ず **英語** で記述してください。
 
 ### MCP servers の利用に関して
 
