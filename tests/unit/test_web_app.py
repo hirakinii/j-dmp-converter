@@ -32,8 +32,8 @@ class TestListFormats:
         data = response.json()
         assert "readers" in data
         assert "writers" in data
-        assert sorted(data["readers"]) == ["amed", "cfa", "jsps", "meti"]
-        assert sorted(data["writers"]) == ["amed", "cfa", "jsps", "meti"]
+        assert sorted(data["readers"]) == ["amed", "cfa", "cir", "jsps", "meti"]
+        assert sorted(data["writers"]) == ["amed", "cfa", "cir", "jsps", "meti"]
 
 
 class TestConvertEndpoint:
@@ -182,3 +182,56 @@ class TestConvertComplete:
         )
 
         assert response.status_code == 400
+
+
+class TestCirJsonConversion:
+    """CIR JSON format conversion tests."""
+
+    def test_convert_amed_to_cir(self, client: TestClient) -> None:
+        """Upload AMED fixture, convert to CIR JSON — should return .json file."""
+        fixture = FIXTURES_DIR / "filled_amed_sample.xlsx"
+        with open(fixture, "rb") as f:
+            response = client.post(
+                "/convert",
+                params={"source_format": "amed", "target_format": "cir"},
+                files={"file": ("filled_amed_sample.xlsx", f, "application/octet-stream")},
+            )
+
+        assert response.status_code == 200
+        assert ".json" in response.headers.get("content-disposition", "")
+        # Response should be valid JSON containing a DMP
+        data = response.json()
+        assert "title" in data
+        assert "dataset" in data
+
+    def test_convert_cir_to_amed(
+        self, client: TestClient, sample_dmp
+    ) -> None:
+        """Upload CIR JSON, convert to AMED — should return .xlsx file."""
+        json_content = sample_dmp.model_dump_json(indent=2).encode("utf-8")
+
+        response = client.post(
+            "/convert",
+            params={"source_format": "cir", "target_format": "amed"},
+            files={"file": ("dmp.json", json_content, "application/json")},
+        )
+
+        assert response.status_code == 200
+        assert ".xlsx" in response.headers.get("content-disposition", "")
+        assert len(response.content) > 0
+
+    def test_convert_complete_cir_target(
+        self, client: TestClient, sample_dmp
+    ) -> None:
+        """POST a DMP JSON to /convert/complete with cir target — should return .json."""
+        dmp_json = sample_dmp.model_dump(mode="json")
+        response = client.post(
+            "/convert/complete",
+            params={"target_format": "cir"},
+            json=dmp_json,
+        )
+
+        assert response.status_code == 200
+        assert ".json" in response.headers.get("content-disposition", "")
+        data = response.json()
+        assert data["title"] == sample_dmp.title

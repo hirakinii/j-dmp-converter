@@ -8,6 +8,7 @@ AMED  (Excel) ─→ Reader ─→ CIR (JSON) ─→ Writer ─→ JSPS (Excel)
 JSPS  (Excel) ─→ Reader ─→ CIR (JSON) ─→ Writer ─→ METI (Excel)
 METI  (Excel) ─→ Reader ─→ CIR (JSON) ─→ Writer ─→ AMED (Excel)
 CFA   (Word)  ─→ Reader ─→ CIR (JSON) ─→ Writer ─→ CFA  (Word)
+CIR   (JSON)  ─→ Reader ─→ CIR (JSON) ─→ Writer ─→ CIR  (JSON)
 ```
 
 ## 特徴
@@ -27,6 +28,7 @@ CFA   (Word)  ─→ Reader ─→ CIR (JSON) ─→ Writer ─→ CFA  (Word)
 | JSPS（日本学術振興会） | Excel (XLSX) | o | o | 科研費 DMP 様式例 |
 | METI（経済産業省） | Excel (XLSX) | o | o | 委託研究 DMP 様式 |
 | CFA（研究助成プログラム） | Word (DOCX) | o | o | CFA DMP 様式 |
+| CIR（共通中間表現） | JSON | o | o | CIR の直接読み書き |
 
 ## クイックスタート
 
@@ -119,6 +121,9 @@ uv run python examples/basic_conversion.py tests/fixtures/filled_amed_sample.xls
 # AMED → CFA 変換（Excel → Word）
 uv run python examples/amed_to_cfa_conversion.py tests/fixtures/filled_amed_sample.xlsx
 
+# AMED → CIR JSON → JSPS 変換（中間ファイル経由）
+uv run python examples/cir_json_conversion.py tests/fixtures/filled_amed_sample.xlsx
+
 # 複数形式への一括変換
 uv run python examples/multi_format_conversion.py tests/fixtures/filled_amed_sample.xlsx
 ```
@@ -141,17 +146,20 @@ j-dmp-converter/
 │   ├── readers/
 │   │   ├── base.py            # Reader 抽象基底クラス
 │   │   ├── excel_reader.py    # Excel Reader
-│   │   └── docx_reader.py     # Word (DOCX) Reader
+│   │   ├── docx_reader.py     # Word (DOCX) Reader
+│   │   └── cir_json_reader.py # CIR JSON Reader
 │   └── writers/
 │       ├── base.py            # Writer 抽象基底クラス
 │       ├── excel_writer.py    # Excel Writer
-│       └── docx_writer.py     # Word (DOCX) Writer
+│       ├── docx_writer.py     # Word (DOCX) Writer
+│       └── cir_json_writer.py # CIR JSON Writer
 ├── web/
 │   ├── app.py                 # FastAPI アプリケーション
 │   └── startup.py             # Reader/Writer 一括登録
 ├── examples/
 │   ├── basic_conversion.py    # AMED → JSPS 基本変換
 │   ├── amed_to_cfa_conversion.py  # Excel → Word 変換
+│   ├── cir_json_conversion.py # CIR JSON 経由変換
 │   └── multi_format_conversion.py # 複数形式への一括変換
 ├── tests/
 │   ├── conftest.py            # 共通フィクスチャ (sample_dmp)
@@ -233,7 +241,7 @@ uv run pytest tests/unit/ -v
 uv run pytest tests/integration/ -v
 ```
 
-現在のテスト結果: **108 テスト全 PASS**
+現在のテスト結果: **121 テスト全 PASS**
 
 | テストファイル | テスト数 | 内容 |
 |---------------|---------|------|
@@ -244,7 +252,9 @@ uv run pytest tests/integration/ -v
 | `test_excel_reader.py` | 35 | unflatten、DMP 構築、AMED/JSPS/METI 読み込み、ラウンドトリップ |
 | `test_docx_reader.py` | 11 | CFA Word 読み込み、ラウンドトリップ |
 | `test_docx_writer.py` | 8 | CFA Word 書き出し、バリデーション |
-| `test_web_app.py` | 10 | Web API エンドポイント、変換・バリデーション |
+| `test_cir_json_reader.py` | 5 | CIR JSON 読み込み、ラウンドトリップ、エラーハンドリング |
+| `test_cir_json_writer.py` | 5 | CIR JSON 書き出し、ラウンドトリップ、UTF-8、バリデーション |
+| `test_web_app.py` | 13 | Web API エンドポイント、変換・バリデーション、CIR JSON 変換 |
 | `test_conversion.py` | 8 | AMED→JSPS/METI 変換、フィクスチャ経由フルパイプライン |
 
 ## 開発ロードマップ
