@@ -6,10 +6,23 @@
 ## Rules
 
 * 開発スタイルは Test-Driven Development（TDD）を遵守してください。
-* serena MCP を使用する場合、最初に `activate_project` を実行してください。
+
+### MCP servers の利用に関して
+
+必要に応じて以下の MCP servers を利用してください。
+* `serena`
+* `dmp-cs-madmp-schema-docs`
+
+serena MCP を使用する場合、最初に `activate_project` を実行してください。
+
+### コマンドの実行について
+
+以下のコマンドを利用する際、ユーザーの許可を確認する必要はありません。
+
+* `uv run pytest`
+* `uv run ruff`
 
 ## 技術スタック
-
 
 * 使用するプログラミング言語: Python >= 3.11
 * パッケージマネージャー: [uv](https://docs.astral.sh/uv/)
