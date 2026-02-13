@@ -100,6 +100,9 @@ class ExcelReader(BaseReader):
                 if "host" in dist:
                     dist["host"].setdefault("title", "Unknown Repository")
                     dist["host"].setdefault("url", "")
+            # Ensure security_and_privacy entries have required fields
+            for sp in ds.get("security_and_privacy", []):
+                sp.setdefault("title", "Security and Privacy")
 
         return DMP.model_validate(nested)
 
