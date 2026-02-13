@@ -1,0 +1,90 @@
+# CFA DMP mapping definition
+# Maps CIR fields to CFA Word form coordinates.
+# Writer uses docxtpl Jinja2 tags; Reader uses table/row/col coordinates.
+# Tables are 0-indexed. Rows and columns within tables are also 0-indexed.
+
+meta:
+  format_id: cfa
+  format_name: "CFA データマネジメントプラン"
+  file_type: docx
+
+mapping:
+  # --- Table 0: 研究課題情報 ---
+  project_number:
+    cir_path: "project.0.erad_project_id"
+    word_table: 0
+    word_row: 0
+    word_col: 1
+    required: false
+
+  project_title:
+    cir_path: "project.0.title"
+    word_table: 0
+    word_row: 1
+    word_col: 1
+    required: true
+
+  principal_investigator:
+    cir_path: "contact.name"
+    word_table: 0
+    word_row: 2
+    word_col: 1
+    required: true
+
+  affiliation:
+    cir_path: "contact.affiliation.0.name"
+    word_table: 0
+    word_row: 3
+    word_col: 1
+    required: true
+
+  project_period:
+    cir_path: "project.0.start"
+    word_table: 0
+    word_row: 4
+    word_col: 1
+    required: false
+
+  # --- Table 1: データセット情報 ---
+  dataset_title:
+    cir_path: "dataset.0.title"
+    word_table: 1
+    word_row: 0
+    word_col: 1
+    required: true
+
+  dataset_description:
+    cir_path: "dataset.0.description"
+    word_table: 1
+    word_row: 1
+    word_col: 1
+    required: false
+
+  data_access:
+    cir_path: "dataset.0.distribution.0.data_access"
+    word_table: 1
+    word_row: 2
+    word_col: 1
+    required: true
+
+  repository_url:
+    cir_path: "dataset.0.distribution.0.host.url"
+    word_table: 1
+    word_row: 3
+    word_col: 1
+    required: false
+
+  # --- Table 2: データ管理体制 ---
+  data_manager:
+    cir_path: "contributor.0.name"
+    word_table: 2
+    word_row: 0
+    word_col: 1
+    required: false
+
+  data_manager_contact:
+    cir_path: "contributor.0.mbox"
+    word_table: 2
+    word_row: 1
+    word_col: 1
+    required: false
